@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Zodiac Compatibility — MysticFate | Free Astrology Compatibility Analysis</title>
+  <meta name="description" content="Free zodiac compatibility calculator. Discover how any two zodiac signs align in love, friendship, and work. Honest, detailed compatibility analysis.">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .selector-area { max-width: 700px; margin: 0 auto 3rem; }
+    .sign-selects { display: flex; gap: 2rem; justify-content: center; align-items: center; flex-wrap: wrap; margin: 2rem 0; }
+    .sign-select-box { text-align: center; }
+    .sign-select-box select { width: 200px; font-size: 1.1rem; }
+    .vs-divider { font-family: 'Cinzel', serif; font-size: 2rem; color: var(--gold); }
+    .compat-result { display: none; }
+    .compat-result.show { display: block; animation: fadeIn 0.8s ease-out; }
+    .score-display { text-align: center; margin-bottom: 3rem; }
+    .score-circle { width: 180px; height: 180px; margin: 0 auto 1.5rem; border-radius: 50%; border: 4px solid var(--gold); display: flex; align-items: center; justify-content: center; flex-direction: column; background: radial-gradient(circle, rgba(212,168,67,0.1), transparent); }
+    .score-number { font-family: 'Cinzel', serif; font-size: 3.5rem; font-weight: 700; color: var(--gold); line-height: 1; }
+    .score-label { font-family: 'Inter', sans-serif; font-size: 0.75rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 2px; margin-top: 0.5rem; }
+    .score-desc { font-family: 'Cormorant Garamond', serif; font-size: 1.2rem; color: var(--text); font-style: italic; }
+    .compat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; margin: 2rem 0; }
+    .compat-card { padding: 2rem; }
+    .compat-card h3 { margin-bottom: 0.8rem; font-size: 1.1rem; }
+    .compat-card .icon { font-size: 2rem; display: block; margin-bottom: 0.8rem; }
+    .compat-card .rating { color: var(--gold); font-size: 1.2rem; letter-spacing: 2px; margin-bottom: 0.8rem; display: block; }
+    .compat-card p { color: var(--text); line-height: 1.7; font-size: 0.95rem; }
+    .overview-text { font-size: 1.1rem; line-height: 1.8; color: var(--text); margin: 2rem 0; }
+  </style>
+</head>
+<body>
+  <nav class="nav">
+    <a href="index.html" class="nav-logo">✦ MysticFate</a>
+    <button class="nav-toggle" onclick="document.querySelector('.nav-links').classList.toggle('open')">☰</button>
+    <ul class="nav-links">
+      <li><a href="tarot.html">Tarot</a></li>
+      <li><a href="zodiac.html">Zodiac</a></li>
+      <li><a href="numerology.html">Numerology</a></li>
+      <li><a href="compatibility.html" class="active">Compatibility</a></li>
+    </ul>
+  </nav>
+  <main>
+    <section class="section">
+      <div style="text-align:center">
+        <h1 class="fade-in">Zodiac Compatibility</h1>
+        <p class="subtitle fade-in-delay">The stars reveal how two signs align — in love, friendship, and work. Select two signs to discover their cosmic connection.</p>
+        <div class="divider"></div>
+      </div>
+      <div class="selector-area">
+        <div class="sign-selects">
+          <div class="sign-select-box"><label>First Sign</label><select id="sign1"><option value="">Select Sign</option></select></div>
+          <div class="vs-divider">×</div>
+          <div class="sign-select-box"><label>Second Sign</label><select id="sign2"><option value="">Select Sign</option></select></div>
+        </div>
+        <div style="text-align:center"><button class="btn btn-primary" id="analyzeBtn">Analyze Compatibility</button></div>
+      </div>
+      <div class="compat-result" id="compatResult"></div>
+    </section>
+    <div class="tip-jar">
+      <h3>☕ Support MysticFate</h3>
+      <p>Enjoyed your reading? Buy MysticFate a coffee ☕</p>
+      <div class="tip-networks"><span>ETH</span><span>USDC</span><span>BSC</span><span>Polygon</span></div>
+      <div class="wallet-address" onclick="navigator.clipboard.writeText('0xEeD903787Cb86bcCc17777E5C7d10A4c2De43823').then(()=>this.textContent='✓ Copied!')">0xEeD903787Cb86bcCc17777E5C7d10A4c2De43823</div>
+    </div>
+  </main>
+  <footer class="footer"><p>© 2025 MysticFate · For entertainment purposes</p></footer>
+<script>
+const S=["Aries","Taurus","Gemini","Cancer","Leo","Virgo","Libra","Scorpio","Sagittarius","Capricorn","Aquarius","Pisces"];
+const SYM={Aries:"♈",Taurus:"♉",Gemini:"♊",Cancer:"♋",Leo:"♌",Virgo:"♍",Libra:"♎",Scorpio:"♏",Sagittarius:"♐",Capricorn:"♑",Aquarius:"♒",Pisces:"♓"};
+const EL={Aries:"Fire",Taurus:"Earth",Gemini:"Air",Cancer:"Water",Leo:"Fire",Virgo:"Earth",Libra:"Air",Scorpio:"Water",Sagittarius:"Fire",Capricorn:"Earth",Aquarius:"Air",Pisces:"Water"};
+const s1=document.getElementById('sign1'),s2=document.getElementById('sign2');
+S.forEach(s=>{const o1=document.createElement('option');o1.value=s;o1.textContent=`${SYM[s]} ${s}`;const o2=o1.cloneNode(true);s1.appendChild(o1);s2.appendChild(o2);});
+function stars(n,m=5){return '★'.repeat(n)+'☆'.repeat(m-n);}
+const C={
+"Aries-Leo":{s:90,l:5,f:5,w:4,o:"Two fire signs create explosive chemistry. Passionate, ambitious, loyal. Ego clashes possible but quickly resolved. When aligned, unstoppable.",lv:"Exceptional passion and mutual admiration. Both crave excitement and deliver grand gestures. Potential for power struggles.",fr:"Inspire and celebrate each other endlessly. Share adventures and fierce loyalty.",wk:"Powerful if roles are clear. Both lead naturally — best when each has defined authority."},
+"Aries-Sagittarius":{s:95,l:5,f:5,w:5,o:"Perfect fire match. Shared love of adventure, honesty, freedom. Easy, fun, energizing. Minimal conflict.",lv:"Exceptional. Built on friendship, adventure, mutual respect for independence. Direct communication.",fr:"Endless fun. Inspire each other constantly. Minimal drama.",wk:"Highly effective. Both entrepreneurial and innovative. Build quickly, dream big."},
+"Aries-Aquarius":{s:85,l:4,f:5,w:5,o:"Fire and air brilliance. Independent, innovative, unconventional. Mutual respect for freedom.",lv:"Exciting and unconventional. Built on friendship and shared ideals. Emotionally requires conscious effort.",fr:"Exceptional. Inspire each other, endless conversations, support individuality.",wk:"Highly innovative. Visionaries who challenge convention."},
+"Aries-Gemini":{s:85,l:5,f:5,w:4,o:"Fire and air energize each other. Action meets ideas. Both value independence and novelty.",lv:"Exciting, playful, honest. Variety and adventure keep it alive. Risk: excitement overshadows depth.",fr:"Outstanding. Endless fun, inspire best qualities, minimal drama.",wk:"Creative and productive. Generate innovative solutions quickly."},
+"Aries-Libra":{s:70,l:4,f:4,w:3,o:"Opposites attract. Aries is 'me,' Libra is 'we.' Magnetic but requires balance.",lv:"Strong attraction. Challenges: Aries's bluntness vs Libra's sensitivity. Can balance beautifully.",fr:"Good when appreciating differences. Balance each other in groups.",wk:"Challenging but powerful. Aries drives results, Libra builds relationships."},
+"Aries-Aries":{s:75,l:4,f:5,w:3,o:"Double fire. Electric, competitive, never boring. Challenge: who leads? Success requires shared goals.",lv:"Instant passion. Direct about desires. Thrives on adventure. Compromise doesn't come naturally.",fr:"Exceptional. Push each other to greatness. Compete playfully.",wk:"Challenging unless roles defined. Both want to lead."},
+"Aries-Scorpio":{s:60,l:4,f:3,w:4,o:"Intense power dynamic. Both ruled by Mars. Can be powerful allies or devastating enemies.",lv:"Magnetic chemistry. Power struggles inevitable. Trust is make-or-break.",fr:"Complex but potentially deep. Both value loyalty and courage.",wk:"Powerful when aligned. Formidable competitors together."},
+"Aries-Pisces":{s:55,l:3,f:3,w:2,o:"Fire and water create steam. Direct vs intuitive. Requires patience from both.",lv:"Challenging but transformative. Aries protects, Pisces softens. Bluntness vs sensitivity.",fr:"Operate on different wavelengths. Moderate compatibility.",wk:"Difficult. Aggressive tactics clash with intuitive approach."},
+"Aries-Capricorn":{s:50,l:3,f:2,w:4,o:"Cardinal clash. Both leaders with different approaches. Impulsive vs strategic.",lv:"Growth-inducing. Attraction through difference. Financial conflicts common.",fr:"Limited chemistry. Respect drive but different values.",wk:"Effective. Aries starts, Capricorn finishes. Balance risk with responsibility."},
+"Aries-Taurus":{s:45,l:2,f:3,w:3,o:"Fire meets earth. Charge ahead vs build slowly. Requires significant compromise.",lv:"Magnetic but challenging. Stability vs spontaneity. Financial conflicts.",fr:"Moderate. Different paces. Aries initiates, Taurus provides resources.",wk:"Productive if roles align. Aries generates, Taurus executes."},
+"Aries-Cancer":{s:40,l:2,f:2,w:2,o:"Fire and water volatility. Direct vs sensitive. Requires exceptional patience.",lv:"Very challenging. Different needs: space vs security. Bluntness wounds.",fr:"Difficult. Operate on different frequencies.",wk:"Strained. Best in separate roles."},
+"Aries-Virgo":{s:35,l:2,f:2,w:3,o:"Impulsive vs careful. Big picture vs details. Requires deep patience.",lv:"Challenging. Criticism wounds ego. Spontaneity triggers anxiety.",fr:"Limited common ground. Different priorities.",wk:"Functional with respect. Aries generates boldness, Virgo refines quality."},
+"Taurus-Virgo":{s:95,l:5,f:5,w:5,o:"Perfect earth harmony. Practical, grounded, quality-focused. Deeply compatible.",lv:"Exceptional. Loyalty, stability, shared values. Improves with time.",fr:"Reliable, low-drama. Understand each other instinctively.",wk:"Highly productive. Hardworking, detail-oriented, quality-focused."},
+"Taurus-Cancer":{s:90,l:5,f:5,w:4,o:"Earth and water nourish beautifully. Security, home, loyalty. Naturally compatible.",lv:"Exceptional. Both value home-building and deep bonds. Create sanctuary together.",fr:"Warm, supportive, enduring. Safe space for vulnerability.",wk:"Effective in comfort businesses. Sustainable focus."},
+"Taurus-Capricorn":{s:90,l:5,f:4,w:5,o:"Earth power couple. Shared ambition, work ethic, material goals. Highly compatible.",lv:"Solid and enduring. Build empire together. Loyalty and reliability.",fr:"Respect-based. Share practical activities. Low drama.",wk:"Exceptional. Both hardworking and strategic. Build lasting value."},
+"Taurus-Pisces":{s:80,l:5,f:4,w:3,o:"Earth grounds water. Taurus provides stability, Pisces provides emotional depth.",lv:"Beautiful romantic chemistry. Taurus protects, Pisces nurtures. Gentle harmony.",fr:"Sweet and supportive. Taurus grounds Pisces's dreams.",wk:"Moderate. Taurus handles practical, Pisces handles creative."},
+"Taurus-Scorpio":{s:75,l:5,f:3,w:4,o:"Opposite signs. Intense magnetic pull. Loyalty and passion. Power struggles possible.",lv:"Intense chemistry. Possessive and deeply bonded. Trust is everything.",fr:"Deep but challenging. Both stubborn. Loyalty when it works.",wk:"Powerful. Taurus builds, Scorpio strategizes. Resource management strength."},
+"Taurus-Libra":{s:65,l:4,f:4,w:3,o:"Both Venus-ruled. Love beauty and harmony. Express differently.",lv:"Compatible through Venus. Sensuality meets romance. Stubbornness vs indecision.",fr:"Enjoy beauty together. Social styles differ.",wk:"Creative projects shine. Balance practicality with aesthetics."},
+"Taurus-Taurus":{s:80,l:5,f:4,w:4,o:"Double earth. Comfort, stability, shared values. Risk: stagnation.",lv:"Deeply compatible. Sensual, stable, loyal. Must consciously introduce novelty.",fr:"Solid and reliable. Neither pushes comfort zones.",wk:"Steady and effective. Extreme resistance to change."},
+"Taurus-Leo":{s:50,l:3,f:3,w:3,o:"Fixed clash. Both stubborn. Quiet comfort vs drama. Requires compromise.",lv:"Challenging. Leo craves drama, Taurus craves comfort. Financial conflicts.",fr:"Respect strength but different social styles.",wk:"Difficult. Both want authority. Must define roles clearly."},
+"Taurus-Gemini":{s:40,l:2,f:3,w:2,o:"Earth vs air. Stability vs variety. Fundamental differences.",lv:"Very challenging. Consistency vs freedom. Different pace and values.",fr:"Limited chemistry. Different interests.",wk:"Difficult. Gemini's pace overwhelms Taurus's thoroughness."},
+"Taurus-Aquarius":{s:35,l:2,f:2,w:2,o:"Fixed clash with opposite natures. Traditional vs unconventional.",lv:"Very challenging. Security vs freedom. Routine vs novelty.",fr:"Minimal natural chemistry. Vastly different worldviews.",wk:"Strained. Taurus builds traditionally, Aquarius innovates radically."},
+"Gemini-Aquarius":{s:95,l:5,f:5,w:5,o:"Air brilliance. Intellectual, innovative, free. Exceptional compatibility.",lv:"Outstanding. Mental connection fuels everything. Freedom and variety.",fr:"Endless fascinating conversations. Inspire innovation.",wk:"Visionary team. Ideas and networking create breakthroughs."},
+"Gemini-Libra":{s:90,l:5,f:5,w:4,o:"Air harmony. Social, intellectual, balanced. Natural compatibility.",lv:"Delightful. Communicate beautifully. Romantic and mentally stimulating.",fr:"Exceptional social chemistry. Balance each other.",wk:"Creative and diplomatic. Communicate and negotiate brilliantly."},
+"Gemini-Leo":{s:80,l:4,f:5,w:4,o:"Air fuels fire. Gemini communicates, Leo performs. Fun and dynamic.",lv:"Exciting and playful. Gemini entertains, Leo dazzles. Keep each other engaged.",fr:"Fantastic fun. Social adventures and creative projects.",wk:"Dynamic duo. Gemini networks, Leo leads. Visibility and charisma."},
+"Gemini-Aries":{s:85,l:5,f:5,w:4,o:"Air and fire brilliance. Ideas meet action. Energizing compatibility.",lv:"Exciting and honest. Variety and adventure. Depth requires effort.",fr:"Outstanding fun. Inspire best qualities.",wk:"Innovative and quick. Both impulsive — overlook details."},
+"Gemini-Sagittarius":{s:85,l:4,f:5,w:4,o:"Opposite signs. Both love freedom, learning, adventure. Complementary.",lv:"Adventurous and philosophical. Keep each other mentally stimulated. Need grounding.",fr:"Endless conversations and travels. Inspire exploration.",wk:"Innovative and expansive. Big ideas, networking, exploration."},
+"Gemini-Gemini":{s:75,l:4,f:5,w:3,o:"Double air. Endless communication, variety, wit. Can lack grounding.",lv:"Mentally stimulating but emotionally light. Variety keeps it fresh. Need depth.",fr:"Fantastic wit and conversation. Understand each other's need for space.",wk:"Creative brainstorming. Execution and follow-through challenges."},
+"Gemini-Libra":{s:90,l:5,f:5,w:4,o:"Air harmony. Communicate beautifully. Social and intellectually balanced.",lv:"Delightful chemistry. Mental and romantic balance. Indecision x2 possible.",fr:"Exceptional. Social butterflies together. Balanced perspectives.",wk:"Diplomatic and creative. Networking and relationship building."},
+"Gemini-Pisces":{s:45,l:2,f:3,w:2,o:"Air and water. Logic vs emotion. Different communication styles.",lv:"Challenging. Gemini's logic frustrates Pisces's feelings. Surface vs depth.",fr:"Difficult. Different emotional needs and communication.",wk:"Strained. Gemini's mental approach clashes with Pisces's intuition."},
+"Gemini-Virgo":{s:60,l:3,f:4,w:4,o:"Both Mercury-ruled. Mental connection. Gemini explores, Virgo analyzes.",lv:"Mentally compatible but emotionally challenging. Critique vs changeability.",fr:"Good intellectual rapport. Perfectionism vs restlessness.",wk:"Effective communication and analysis team. Gemini generates, Virgo refines."},
+"Gemini-Scorpio":{s:40,l:2,f:2,w:3,o:"Air and water clash. Light vs intensity. Surface vs depth.",lv:"Very challenging. Gemini's lightness frustrates Scorpio's depth. Trust issues.",fr:"Minimal chemistry. Vastly different emotional needs.",wk:"Difficult. Transparency vs secrecy. Different approaches."},
+"Gemini-Cancer":{s:45,l:2,f:3,w:2,o:"Air and water. Gemini detached, Cancer emotional. Communication struggles.",lv:"Challenging. Cancer needs security, Gemini needs variety. Hurt feelings common.",fr:"Difficult. Different emotional frequencies.",wk:"Strained. Gemini's mental approach clashes with Cancer's feelings."},
+"Gemini-Capricorn":{s:35,l:2,f:2,w:3,o:"Air and earth. Playful vs serious. Variety vs discipline.",lv:"Very challenging. Gemini's lightness vs Capricorn's gravity. Different priorities.",fr:"Minimal chemistry. Different life approaches.",wk:"Moderate. Gemini communicates, Capricorn executes. Respect needed."},
+"Cancer-Pisces":{s:95,l:5,f:5,w:4,o:"Water harmony. Deeply emotional, intuitive, nurturing. Exceptional compatibility.",lv:"Beautiful soul connection. Emotional depth and safety. Nurture each other.",fr:"Deeply empathetic and supportive. Understand without words.",wk:"Creative and compassionate. Healing/artistic fields. Need grounding."},
+"Cancer-Scorpio":{s:90,l:5,f:4,w:4,o:"Water intensity. Emotional depth, loyalty, intuition. Powerful bond.",lv:"Intensely bonded. Emotional and physical chemistry. Possessive but devoted.",fr:"Deep and loyal. Understand each other's complexity.",wk:"Strategic and intuitive. Trust and depth create power."},
+"Cancer-Taurus":{s:90,l:5,f:5,w:4,o:"Water and earth nourish. Security, home, loyalty. Natural fit.",lv:"Exceptional. Build beautiful life together. Nurturing and stable.",fr:"Warm and enduring. Safe emotional harbor.",wk:"Sustainable businesses. Home, food, comfort industries."},
+"Cancer-Virgo":{s:85,l:4,f:5,w:5,o:"Water and earth. Nurturing meets practical. Care through service.",lv:"Sweet compatibility. Cancer nurtures emotionally, Virgo practically. Build stable home.",fr:"Supportive and understanding. Appreciate each other's care.",wk:"Effective team. Cancer handles people, Virgo handles systems."},
+"Cancer-Capricorn":{s:75,l:4,f:3,w:5,o:"Opposite signs. Emotional vs reserved. Home vs career. Complementary.",lv:"Challenging but stable. Cancer provides warmth, Capricorn provides security. Balance needed.",fr:"Respect-based. Different expressions of care.",wk:"Powerful. Cancer handles culture, Capricorn handles structure."},
+"Cancer-Cancer":{s:80,l:5,f:4,w:3,o:"Double water. Deep emotional bond. Nurturing and loyal. Can be moody together.",lv:"Profoundly connected. Understand each other's needs. Risk: emotional overflow.",fr:"Deeply caring. Safe space. Both sensitive — handle gently.",wk:"Collaborative in caring fields. Emotional awareness strength."},
+"Cancer-Libra":{s:55,l:3,f:3,w:3,o:"Different relationship styles. Cancer emotional security, Libra mental harmony.",lv:"Moderate. Both value partnership. Cancer's mood vs Libra's balance. Work needed.",fr:"Pleasant but surface. Different emotional needs.",wk:"Moderate. Cancer nurtures team, Libra harmonizes relationships."},
+"Cancer-Sagittarius":{s:40,l:2,f:2,w:2,o:"Water and fire. Home vs adventure. Security vs freedom. Fundamental clash.",lv:"Very challenging. Cancer needs closeness, Sagittarius needs space. Different priorities.",fr:"Difficult. Vastly different lifestyles and values.",wk:"Strained. Cancer builds internal culture, Sagittarius explores externally."},
+"Cancer-Aquarius":{s:35,l:2,f:2,w:2,o:"Water and air. Emotional vs detached. Personal vs universal. Disconnect.",lv:"Very challenging. Cancer's emotional needs overwhelm Aquarius's detachment.",fr:"Minimal chemistry. Different emotional languages.",wk:"Difficult. Cancer focuses on people, Aquarius on ideas."},
+"Cancer-Leo":{s:50,l:3,f:3,w:3,o:"Water and fire. Nurturing vs attention-seeking. Can complement or clash.",lv:"Challenging. Cancer nurtures, Leo needs admiration. Emotional vs dramatic.",fr:"Moderate. Cancer supports, Leo performs.",wk:"Different leadership styles. Cancer empathetic, Leo charismatic."},
+"Cancer-Gemini":{s:45,l:2,f:3,w:2,o:"Water and air. Emotional vs mental. Different communication.",lv:"Challenging. Cancer's depth vs Gemini's lightness. Security vs variety.",fr:"Difficult frequencies. Limited natural chemistry.",wk:"Strained. Feelings vs logic clash."},
+"Leo-Sagittarius":{s:95,l:5,f:5,w:5,o:"Fire harmony. Optimistic, adventurous, passionate. Exceptional compatibility.",lv:"Explosive chemistry. Both generous and enthusiastic. Keep each other engaged.",fr:"Outstanding. Endless adventures and inspiration.",wk:"Dynamic and visionary. Lead with charisma and optimism."},
+"Leo-Aries":{s:90,l:5,f:5,w:4,o:"Fire power. Passionate, confident, ambitious. Ego management needed.",lv:"Explosive chemistry and admiration. Drama and grand gestures. Share throne.",fr:"Inspire and challenge each other. Loyal and exciting.",wk:"Powerful with clear roles. Both lead naturally."},
+"Leo-Libra":{s:85,l:5,f:5,w:4,o:"Fire and air. Leo performs, Libra harmonizes. Charming and social.",lv:"Romantic and social. Leo's passion meets Libra's charm. Balance drama with diplomacy.",fr:"Delightful social duo. Appreciate beauty and culture.",wk:"Creative and people-focused. Leo leads, Libra connects."},
+"Leo-Gemini":{s:80,l:4,f:5,w:4,o:"Fire and air. Playful, social, entertaining. Dynamic compatibility.",lv:"Fun and engaging. Keep each other interested. Depth requires effort.",fr:"Fantastic adventures. Social and creative.",wk:"Charismatic team. Communication and visibility."},
+"Leo-Aquarius":{s:70,l:3,f:4,w:4,o:"Opposite signs. Drama vs detachment. Personal vs universal. Magnetic tension.",lv:"Challenging attraction. Leo needs admiration, Aquarius needs freedom. Balance personal and universal.",fr:"Respect-based. Different social styles but shared generosity.",wk:"Innovative and leadership. Leo inspires, Aquarius innovates."},
+"Leo-Leo":{s:75,l:4,f:4,w:3,o:"Double fire. Dramatic, passionate, loyal. Ego clashes inevitable.",lv:"Passionate and dramatic. Both need admiration. Power share required.",fr:"Loyal and fun. Compete for spotlight. Mutual respect essential.",wk:"Challenging. Both want leadership. Best as equals in different domains."},
+"Leo-Pisces":{s:50,l:3,f:3,w:3,o:"Fire and water. Confident vs sensitive. Attention vs depth.",lv:"Moderate. Leo protects, Pisces adores. Drama can overwhelm sensitivity.",fr:"Different social needs. Leo extroverted, Pisces introverted.",wk:"Challenging. Leo leads boldly, Pisces serves quietly."},
+"Leo-Capricorn":{s:45,l:2,f:2,w:4,o:"Fire and earth. Drama vs discipline. Extravagant vs conservative.",lv:"Challenging. Leo's spending vs Capricorn's saving. Recognition vs achievement.",fr:"Limited chemistry. Different priorities and styles.",wk:"Moderate. Leo inspires, Capricorn executes. Respect differences."},
+"Leo-Scorpio":{s:55,l:3,f:2,w:4,o:"Fixed fire and water. Power struggle central. Intensity and drama.",lv:"Intense attraction and battles. Both want control. Loyalty if trust established.",fr:"Challenging. Both strong-willed. Respect or conflict.",wk:"Powerful but tense. Leadership and strategy clash."},
+"Leo-Virgo":{s:45,l:2,f:3,w:3,o:"Fire and earth. Drama vs practicality. Extravagant vs efficient.",lv:"Challenging. Leo's grandeur vs Virgo's criticism. Attention needs clash.",fr:"Different styles. Leo social, Virgo reserved.",wk:"Moderate. Leo leads publicly, Virgo manages behind scenes."},
+"Leo-Taurus":{s:50,l:3,f:3,w:3,o:"Fixed clash. Leo dramatic, Taurus stable. Luxury vs comfort.",lv:"Challenging. Financial conflicts. Both stubborn but loyal.",fr:"Moderate. Appreciate loyalty, clash on lifestyle.",wk:"Difficult. Both want control. Define authority clearly."},
+"Leo-Cancer":{s:50,l:3,f:3,w:3,o:"Fire and water. Attention vs nurturing. Public vs private.",lv:"Moderate. Leo needs admiration, Cancer needs security. Different love languages.",fr:"Cordial but different priorities.",wk:"Different leadership. Leo charismatic, Cancer empathetic."},
+"Virgo-Capricorn":{s:95,l:5,f:4,w:5,o:"Earth perfection. Practical, ambitious, quality-focused. Exceptional compatibility.",lv:"Solid and enduring. Shared values and work ethic. Build empire together.",fr:"Respect-based and reliable. Appreciate each other's discipline.",wk:"Highly effective. Detailed planning and persistent execution."},
+"Virgo-Taurus":{s:95,l:5,f:5,w:5,o:"Earth harmony. Grounded, quality-loving, loyal. Perfect compatibility.",lv:"Exceptional. Loyal, stable, appreciate quality together.",fr:"Warm and understanding. Low drama, high support.",wk:"Highly productive. Quality and efficiency focus."},
+"Virgo-Scorpio":{s:85,l:4,f:4,w:5,o:"Earth and water. Analytical meets intuitive. Deep compatibility.",lv:"Intense connection. Virgo analyzes, Scorpio feels deeply. Loyalty and depth.",fr:"Complex but loyal. Understand each other's intensity.",wk:"Powerful investigative team. Detail and strategy combined."},
+"Virgo-Cancer":{s:85,l:4,f:5,w:5,o:"Earth and water. Practical nurturing. Care through service.",lv:"Sweet and stable. Virgo serves, Cancer nurtures. Build secure home.",fr:"Supportive and understanding. Appreciate care.",wk:"Effective. Systems and people balance."},
+"Virgo-Pisces":{s:75,l:4,f:4,w:3,o:"Opposite signs. Practical vs dreamy. Analysis vs intuition. Complementary.",lv:"Balance logic and emotion. Virgo grounds Pisces, Pisces opens Virgo's heart.",fr:"Sweet mutual support. Different perspectives enrich.",wk:"Moderate. Virgo manages details, Pisces brings vision."},
+"Virgo-Virgo":{s:80,l:4,f:4,w:5,o:"Double earth. Mutual understanding. Perfectionism x2.",lv:"Deeply compatible. Understand each other's standards. Risk: over-critical.",fr:"Reliable and low-drama. Appreciate precision.",wk:"Highly efficient. Quality obsession. Need vision from outside."},
+"Virgo-Libra":{s:60,l:3,f:4,w:4,o:"Earth and air. Practical vs idealistic. Detail vs big picture.",lv:"Moderate. Virgo's criticism vs Libra's need for harmony. Balance needed.",fr:"Pleasant but different priorities.",wk:"Complementary. Virgo executes, Libra harmonizes."},
+"Virgo-Aquarius":{s:50,l:2,f:3,w:3,o:"Earth and air. Traditional  vs detachment. Convention vs innovation.",lv:"Very challenging. Virgo's need for order vs Aquarius's need to break rules.",fr:"Minimal chemistry. Different worldviews.",wk:"Moderate. Virgo executes, Aquarius innovates. Friction likely."},
+"Virgo-Sagittarius":{s:45,l:2,f:3,w:3,o:"Earth and fire. Detail vs big picture. Practical vs philosophical.",lv:"Challenging. Virgo's criticism frustrates Sagittarius's optimism.",fr:"Different interests. Limited natural connection.",wk:"Moderate. Virgo refines, Sagittarius expands."},
+"Virgo-Leo":{s:45,l:2,f:3,w:3,o:"Earth and fire. Modest vs dramatic. Service vs spotlight.",lv:"Challenging. Virgo's criticism vs Leo's pride. Different needs.",fr:"Cordial but different social styles.",wk:"Moderate. Virgo manages, Leo leads."},
+"Virgo-Gemini":{s:60,l:3,f:4,w:4,o:"Both Mercury-ruled. Mental connection. Detail vs exploration.",lv:"Moderate. Mental compatibility but emotional challenge.",fr:"Good intellectual rapport.",wk:"Effective communication team. Gemini generates, Virgo refines."}
+};
+const SYM={Aries:"♈",Taurus:"♉",Gemini:"♊",Cancer:"♋",Leo:"♌",Virgo:"♍",Libra:"♎",Scorpio:"♏",Sagittarius:"♐",Capricorn:"♑",Aquarius:"♒",Pisces:"♓"};
+document.getElementById('analyzeBtn').addEventListener('click',()=>{
+const a=document.getElementById('sign1').value,b=document.getElementById('sign2').value;
+if(!a||!b){alert('Please select both signs');return;}
+const key=`${a}-${b}`,rev=`${b}-${a}`;
+const d=COMPAT[key]||COMPAT[rev];
+if(!d)return;
+const scoreDesc=d.s>=90?'Exceptional Match':d.s>=75?'Strong Compatibility':d.s>=60?'Good Potential':d.s>=45?'Moderate Match':'Challenging Pairing';
+const el=document.getElementById('compatResult');
+el.innerHTML=`
+<div class="score-display">
+<h2 style="text-align:center;margin-bottom:1.5rem">${SYM[a]} ${a} × ${SYM[b]} ${b}</h2>
+<div class="score-circle"><div class="score-number">${d.s}</div><div class="score-label">Overall Score</div></div>
+<div class="score-desc">${scoreDesc}</div>
+</div>
+<div class="glass-card" style="padding:2rem;margin-bottom:2rem"><p class="overview-text">${d.o}</p></div>
+<div class="compat-grid">
+<div class="glass-card compat-card"><span class="icon">❤️</span><h3>Love & Romance</h3><span class="rating">${stars(d.l)}</span><p>${d.lv}</p></div>
+<div class="glass-card compat-card"><span class="icon">🤝</span><h3>Friendship</h3><span class="rating">${stars(d.f)}</span><p>${d.fr}</p></div>
+<div class="glass-card compat-card"><span class="icon">💼</span><h3>Work & Career</h3><span class="rating">${stars(d.w)}</span><p>${d.wk}</p></div>
+</div>`;
+el.classList.add('show');
+el.scrollIntoView({behavior:'smooth',block:'start'});
+});
+</script>
+</body>
+</html>

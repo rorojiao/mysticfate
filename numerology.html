@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Numerology — MysticFate | Discover Your Life Path Number</title>
+  <meta name="description" content="Free numerology calculator. Enter your birth date to discover your Life Path Number (1-9, 11, 22, 33) with detailed personality and destiny analysis.">
+  <meta name="keywords" content="numerology, life path number, birth date numerology, master numbers, numerology reading, free numerology">
+  <meta property="og:title" content="Free Numerology Reading — MysticFate">
+  <meta property="og:description" content="Discover your Life Path Number with detailed personality and destiny analysis.">
+  <meta property="og:type" content="website">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .calc-section { text-align: center; max-width: 500px; margin: 0 auto 3rem; }
+    .date-input-group { display: flex; gap: 1rem; margin: 1.5rem 0; justify-content: center; flex-wrap: wrap; }
+    .date-input-group select, .date-input-group input { width: auto; min-width: 100px; text-align: center; }
+    .life-path-result { display: none; }
+    .life-path-result.show { display: block; animation: fadeIn 0.8s ease-out; }
+    .number-display { text-align: center; margin-bottom: 3rem; }
+    .number-big { font-family: 'Cinzel', serif; font-size: 6rem; font-weight: 700; color: var(--gold); line-height: 1; text-shadow: 0 0 40px rgba(212,168,67,0.3); animation: glow-pulse 3s infinite; }
+    .number-title { font-family: 'Cinzel', serif; color: var(--gold-light); font-size: 1.3rem; margin-top: 0.5rem; letter-spacing: 2px; }
+    .master-badge { display: inline-block; padding: 0.3rem 1rem; background: linear-gradient(135deg, var(--gold), var(--gold-dim)); color: var(--deep-purple); font-family: 'Inter', sans-serif; font-size: 0.7rem; letter-spacing: 2px; text-transform: uppercase; border-radius: 20px; margin-top: 1rem; }
+    .calc-breakdown { font-family: 'Inter', sans-serif; color: var(--text-dim); font-size: 0.85rem; margin-top: 1.5rem; padding: 1rem; background: rgba(0,0,0,0.2); border-radius: var(--radius); }
+    .trait-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; margin: 2rem 0; }
+    .trait-card { padding: 2rem; }
+    .trait-card h3 { margin-bottom: 0.8rem; font-size: 1rem; }
+    .trait-card p { color: var(--text); line-height: 1.7; font-size: 0.95rem; }
+    .trait-card .trait-icon { font-size: 2rem; display: block; margin-bottom: 0.8rem; }
+    .detail-section { margin: 2rem 0; }
+    .detail-section h2 { margin-bottom: 1rem; font-size: 1.4rem; }
+    .detail-section p { font-size: 1.05rem; line-height: 1.8; color: var(--text); }
+    .compat-numbers { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; margin-top: 1rem; }
+    .compat-num { width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; border: 2px solid var(--gold); border-radius: 50%; font-family: 'Cinzel', serif; font-size: 1.2rem; color: var(--gold); }
+    .keywords { display: flex; gap: 0.8rem; justify-content: center; flex-wrap: wrap; margin: 1.5rem 0; }
+    .keywords span { font-family: 'Inter', sans-serif; font-size: 0.75rem; padding: 0.3rem 0.8rem; border: 1px solid var(--glass-border); border-radius: 20px; color: var(--text-dim); letter-spacing: 0.5px; }
+  </style>
+</head>
+<body>
+  <nav class="nav">
+    <a href="index.html" class="nav-logo">✦ MysticFate</a>
+    <button class="nav-toggle" onclick="document.querySelector('.nav-links').classList.toggle('open')">☰</button>
+    <ul class="nav-links">
+      <li><a href="tarot.html">Tarot</a></li>
+      <li><a href="zodiac.html">Zodiac</a></li>
+      <li><a href="numerology.html" class="active">Numerology</a></li>
+      <li><a href="compatibility.html">Compatibility</a></li>
+    </ul>
+  </nav>
+  <main>
+    <section class="section">
+      <div style="text-align:center">
+        <h1 class="fade-in">Numerology</h1>
+        <p class="subtitle fade-in-delay">Your birth date holds the blueprint of your soul. Enter it below to discover your Life Path Number.</p>
+        <div class="divider"></div>
+      </div>
+      <div class="calc-section">
+        <div class="date-input-group">
+          <select id="birthMonth"><option value="">Month</option></select>
+          <select id="birthDay"><option value="">Day</option></select>
+          <input type="number" id="birthYear" placeholder="Year" min="1900" max="2025" style="max-width:120px">
+        </div>
+        <button class="btn btn-primary" id="calcBtn">Reveal My Life Path</button>
+      </div>
+      <div class="life-path-result" id="result"></div>
+    </section>
+    <div class="tip-jar">
+      <h3>☕ Support MysticFate</h3>
+      <p>Enjoyed your reading? Buy MysticFate a coffee ☕</p>
+      <div class="tip-networks"><span>ETH</span><span>USDC</span><span>BSC</span><span>Polygon</span></div>
+      <div class="wallet-address" onclick="navigator.clipboard.writeText('0xEeD903787Cb86bcCc17777E5C7d10A4c2De43823').then(()=>this.textContent='✓ Copied!')">0xEeD903787Cb86bcCc17777E5C7d10A4c2De43823</div>
+    </div>
+  </main>
+  <footer class="footer"><p>© 2025 MysticFate · For entertainment purposes · <a href="tarot.html">Tarot</a> · <a href="zodiac.html">Zodiac</a> · <a href="numerology.html">Numerology</a> · <a href="compatibility.html">Compatibility</a></p></footer>
+
+<script>
+const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+const monthSel = document.getElementById('birthMonth');
+const daySel = document.getElementById('birthDay');
+months.forEach((m,i) => { const o = document.createElement('option'); o.value = i+1; o.textContent = m; monthSel.appendChild(o); });
+for (let d = 1; d <= 31; d++) { const o = document.createElement('option'); o.value = d; o.textContent = d; daySel.appendChild(o); }
+
+const MASTER = [11, 22, 33];
+function reduceDigits(n) { while (n > 9 && !MASTER.includes(n)) { n = String(n).split('').reduce((a, b) => a + parseInt(b), 0); } return n; }
+function calcLifePath(m, d, y) {
+  const rm = reduceDigits(m), rd = reduceDigits(d);
+  const ry = reduceDigits(String(y).split('').reduce((a,b) => a + parseInt(b), 0));
+  const total = rm + rd + ry;
+  return { number: reduceDigits(total), breakdown: `Month ${m} → ${rm} | Day ${d} → ${rd} | Year ${y} → ${ry} | Sum: ${rm} + ${rd} + ${ry} = ${total} → ${reduceDigits(total)}` };
+}
+
+const R = {
+  1: { title:"The Leader", keywords:["Independence","Ambition","Innovation","Determination","Originality"],
+    personality:"You are a born pioneer with an independent spirit that refuses to follow the crowd. Your natural confidence and determination make you a trailblazer in everything you do. You possess an innate ability to stand alone and lead others through uncharted territory. Your originality of thought and self-reliance are your greatest assets — you don't just walk your own path, you forge it.",
+    strengths:"Natural leadership, creative vision, unwavering determination, self-motivation, courage to act on convictions, innovative thinking, and the charisma to inspire others.",
+    challenges:"Stubbornness, impatience with others' pace, difficulty accepting help, tendency toward self-centeredness, and an ego that sometimes overshadows collaboration.",
+    love:"In love, you need a partner who respects your independence while offering genuine intellectual and emotional partnership. You're attracted to strength but must learn that vulnerability isn't weakness. Your ideal relationship balances passionate autonomy with deep commitment.",
+    career:"You thrive as entrepreneurs, innovators, CEOs, freelancers, or any role requiring self-direction. Routine kills your spirit — you need space to create, lead, and pioneer.",
+    destiny:"Your life's purpose is to develop your individuality fully and use it to blaze trails for others. You're here to innovate, lead, and demonstrate that authentic self-expression is the highest form of contribution.",
+    compatible:[3,5,7]},
+  2: { title:"The Diplomat", keywords:["Cooperation","Sensitivity","Balance","Harmony","Intuition"],
+    personality:"You are the great mediator — gifted with extraordinary sensitivity to the feelings and needs of others. Your intuitive understanding of human dynamics makes you an invaluable partner, friend, and collaborator. Where others see conflict, you see the space between opposing views where harmony lives.",
+    strengths:"Deep empathy, intuition, diplomatic skill, patience, attention to detail, loyal partnership, ability to see all perspectives, and creating peace in chaos.",
+    challenges:"Oversensitivity, indecisiveness, tendency to lose yourself in others' needs, difficulty asserting boundaries, and emotional vulnerability that can lead to resentment.",
+    love:"Love is your native language. You crave deep emotional connection, genuine partnership, and the security of being truly known. You're the partner who remembers every detail and anticipates every need.",
+    career:"You excel as counselors, mediators, diplomats, healers, artists, and any role requiring sensitivity to human needs. Collaborative environments suit you better than competitive ones.",
+    destiny:"Your life's purpose is to bring harmony and cooperation to a divided world. You're here to demonstrate that true strength lies in gentleness.",
+    compatible:[4,6,8]},
+  3: { title:"The Creative", keywords:["Expression","Joy","Creativity","Communication","Inspiration"],
+    personality:"You are the embodiment of creative expression — words, images, ideas, and emotions pour from you in an endless, colorful stream. Your optimism and enthusiasm are genuinely infectious; people feel more alive in your presence. You see beauty and possibility everywhere.",
+    strengths:"Artistic talent, verbal brilliance, optimism, charisma, imagination, ability to inspire joy, emotional expressiveness, and a natural talent for storytelling.",
+    challenges:"Scattered energy, superficiality, mood swings, difficulty with discipline and follow-through, tendency to use humor as emotional armor, and restlessness.",
+    love:"You need a partner who celebrates your creativity and matches your emotional expressiveness. Boring relationships are relationship-killers for you. Laughter, spontaneity, and deep conversation are your love languages.",
+    career:"Born for creative fields — writing, art, music, acting, design, marketing, public speaking, or any role where self-expression is valued. You're the idea person, the presenter.",
+    destiny:"Your life's purpose is to uplift humanity through creative expression and joy. You're here to prove that art isn't frivolous — it's essential medicine for the human spirit.",
+    compatible:[1,5,9]},
+  4: { title:"The Builder", keywords:["Stability","Discipline","Hard Work","Order","Foundation"],
+    personality:"You are the architect of lasting structures — both physical and metaphorical. Where others dream, you build. Your extraordinary discipline, patience, and work ethic create foundations that endure for generations. You find deep satisfaction in order, process, and the tangible results of sustained effort.",
+    strengths:"Incredible work ethic, reliability, practical wisdom, organizational genius, patience, loyalty, ability to turn plans into reality, and unwavering determination.",
+    challenges:"Rigidity, resistance to change, tendency toward workaholism, difficulty with spontaneity, can be perceived as boring or controlling, and stubbornness rooted in fear.",
+    love:"You express love through reliability, protection, and practical care. You're the partner who builds the house, maintains the car, and shows up every single day without fail.",
+    career:"You excel in engineering, architecture, project management, finance, operations, or any field requiring systematic thinking and persistent execution.",
+    destiny:"Your life's purpose is to create lasting foundations that serve others long after you're gone. Patience and discipline are the true architects of meaningful achievement.",
+    compatible:[2,6,8]},
+  5: { title:"The Adventurer", keywords:["Freedom","Change","Adventure","Versatility","Experience"],
+    personality:"You are the embodiment of freedom — restless, curious, and magnetically drawn to every form of experience life offers. Your versatility and adaptability allow you to thrive in situations that would overwhelm others. Routine is your prison and change is your oxygen.",
+    strengths:"Adaptability, courage, magnetic charm, versatility, progressive thinking, resourcefulness in crisis, ability to inspire others to break free, and an infectious love of life.",
+    challenges:"Restlessness, commitment phobia, overindulgence, scattered energy, difficulty with routine, impulsiveness, and a tendency to abandon things when the novelty fades.",
+    love:"You need a partner who values freedom as much as you do — someone who understands that love isn't a cage. Travel, adventure, and new experiences shared together keep your flame alive.",
+    career:"You thrive in travel, sales, media, entrepreneurship, emergency services, or any role offering variety and autonomy. Desk jobs without variety will destroy your spirit.",
+    destiny:"Your life's purpose is to demonstrate that freedom and responsibility can coexist, and that the richest life is one lived broadly and deeply.",
+    compatible:[1,3,7]},
+  6: { title:"The Nurturer", keywords:["Responsibility","Love","Family","Healing","Service"],
+    personality:"You are the heart of every community you touch — a natural healer, protector, and nurturer whose love extends in ever-widening circles. Your sense of responsibility toward others borders on sacred, and your home is your temple.",
+    strengths:"Unconditional love, responsibility, artistic sensibility, healing presence, community building, domestic grace, loyalty, and an ability to create beauty and comfort anywhere.",
+    challenges:"Martyrdom, over-giving, controlling through care, difficulty receiving, perfectionism about home and family, meddling, and neglecting yourself while nurturing everyone else.",
+    love:"Love is your life's purpose in many ways. You create homes that are sanctuaries and relationships that feel like coming home. Your generosity is legendary.",
+    career:"You excel in healthcare, counseling, education, interior design, hospitality, social work, or any healing/nurturing profession.",
+    destiny:"Your life's purpose is to heal through love and demonstrate that genuine care for others is the highest human calling.",
+    compatible:[2,4,9]},
+  7: { title:"The Seeker", keywords:["Wisdom","Spirituality","Analysis","Introspection","Truth"],
+    personality:"You are the philosopher, the mystic, the scientist of the soul. Your mind operates on frequencies others can't access — probing beneath surfaces, questioning assumptions, and seeking truth with relentless intellectual and spiritual hunger. Solitude is your laboratory.",
+    strengths:"Profound intellect, spiritual depth, analytical brilliance, intuition, independence of thought, research ability, and the wisdom that comes from deep contemplation.",
+    challenges:"Isolation, emotional detachment, over-analysis, skepticism that borders on cynicism, difficulty with small talk and social norms, and a tendency toward secrecy.",
+    love:"You need a partner who respects your need for solitude and matches your intellectual depth. Surface-level connection leaves you cold. The partner who can sit in silence with you and discuss philosophy is your ideal.",
+    career:"You excel in research, science, technology, psychology, philosophy, spirituality, writing, and any field requiring deep, focused analysis.",
+    destiny:"Your life's purpose is to seek truth and share the wisdom you discover. You're the lighthouse — solitary but essential, illuminating what others cannot see.",
+    compatible:[1,5,9]},
+  8: { title:"The Powerhouse", keywords:["Abundance","Authority","Achievement","Material Mastery","Karma"],
+    personality:"You are built for achievement on a grand scale. The number 8 carries the energy of material mastery, financial intelligence, and the karmic understanding that power and responsibility are inseparable. You think in empires, not errands.",
+    strengths:"Business acumen, financial intelligence, executive ability, stamina, ambition, organizational power, and the ability to manifest abundance through disciplined effort.",
+    challenges:"Workaholism, materialism, power struggles, difficulty with emotional expression, tendency to equate worth with wealth, and karmic lessons around the use and abuse of power.",
+    love:"You show love through provision and protection. Your partner needs to understand your ambition is an expression of care, not neglect. You need someone who sees your vulnerability beneath the success.",
+    career:"Born for business — CEO, investor, attorney, surgeon, executive, or any role requiring authority and strategic thinking. You build wealth and institutions.",
+    destiny:"Your life's purpose is to master the material world while maintaining spiritual integrity. You're here to demonstrate that abundance and ethics can coexist magnificently.",
+    compatible:[2,4,6]},
+  9: { title:"The Humanitarian", keywords:["Compassion","Wisdom","Universal Love","Completion","Selflessness"],
+    personality:"You are the old soul of numerology — carrying the wisdom and compassion of all the numbers that came before you. Your heart beats for humanity, not just individuals. You see the bigger picture and feel called to serve causes larger than yourself.",
+    strengths:"Universal compassion, wisdom, artistic talent, charisma, selfless service, global perspective, and the ability to inspire others toward their highest potential.",
+    challenges:"Emotional distance, difficulty with personal relationships when focused on 'saving the world,' tendency toward self-righteousness, and struggles with letting go.",
+    love:"You love broadly and deeply, but intimate relationships can challenge you because your heart belongs to the world. Your ideal partner shares your vision and understands that your love is vast, not shallow.",
+    career:"You thrive in humanitarian work, nonprofit leadership, art, teaching, healing, counseling, or any role that serves a larger purpose. Money motivates you less than meaning.",
+    destiny:"Your life's purpose is to embody universal love and serve humanity through compassion, wisdom, and selfless action. You close cycles and heal collective wounds.",
+    compatible:[3,6,7]},
+  11: { title:"The Visionary", keywords:["Illumination","Intuition","Spiritual Insight","Inspiration","Channeling"],
+    personality:"You carry the vibration of spiritual illumination — a Master Number that amplifies the sensitivity of 2 with transcendent insight. You are a channel for higher wisdom, an antenna tuned to frequencies most people can't perceive. Your intuition borders on psychic, and your presence alone can shift the energy of a room.",
+    strengths:"Extraordinary intuition, spiritual leadership, inspirational presence, visionary thinking, healing abilities, and the power to awaken others to higher consciousness.",
+    challenges:"Nervous tension, anxiety, impracticality, feeling overwhelmed by your own sensitivity, difficulty grounding visions into reality, and the loneliness of seeing what others cannot.",
+    love:"You need a partner who understands your spiritual depth without being intimidated by it. Superficial connection is physically painful for you. Your ideal relationship is a spiritual partnership — two souls growing together.",
+    career:"You excel as spiritual leaders, counselors, artists, healers, psychics, inspirational speakers, or any role where your visionary gifts can serve humanity.",
+    destiny:"Your life's purpose is to channel divine inspiration and illuminate the path for others. You are a spiritual teacher — your greatest challenge is believing you're worthy of the light you carry.",
+    compatible:[2,4,6]},
+  22: { title:"The Master Builder", keywords:["Master Architect","Grand Vision","Practical Idealism","Legacy","Manifestation"],
+    personality:"You carry the most powerful number in numerology — the Master Builder. You possess the visionary capacity of 11 combined with the practical building power of 4, creating an extraordinary ability to manifest dreams on a massive scale. You think in generations, not quarters. Your visions aren't fantasies — they're blueprints.",
+    strengths:"Visionary leadership, ability to build on a massive scale, practical idealism, extraordinary discipline combined with inspiration, and the power to turn impossible dreams into concrete reality.",
+    challenges:"Immense internal pressure, tendency to feel the weight of your potential as a burden, perfectionism on a grand scale, workaholism driven by purpose, and the loneliness of thinking bigger than everyone around you.",
+    love:"You need a partner who can match your vision and withstand the intensity of your purpose. Your relationship must serve something larger than itself. The partner who shares your mission becomes your greatest ally.",
+    career:"You build institutions, movements, and legacies — CEO, architect, city planner, philanthropist, political leader, or any role requiring the marriage of grand vision with practical execution.",
+    destiny:"Your life's purpose is to build something that transforms the world. You're the rare soul capable of bridging heaven and earth — turning spiritual ideals into physical structures that serve humanity for generations.",
+    compatible:[4,6,8]},
+  33: { title:"The Master Teacher", keywords:["Universal Service","Healing","Compassion","Spiritual Mastery","Selfless Love"],
+    personality:"You carry the rarest and most spiritually evolved number — the Master Teacher. Combining the creative expression of 3 with the nurturing love of 6, elevated to a master vibration, you embody unconditional love in its purest form. Your very presence heals. You don't just teach wisdom — you embody it.",
+    strengths:"Unconditional love that heals, spiritual mastery, ability to uplift entire communities, selfless service, profound wisdom, and the rare capacity to love without attachment or agenda.",
+    challenges:"Extreme self-sacrifice, difficulty with personal boundaries, bearing the emotional weight of everyone around you, unrealistic expectations from others, and the challenge of maintaining your own identity while serving so broadly.",
+    love:"Love for you is not a relationship — it's a state of being. You love cosmically, which can make personal romance complicated. Your ideal partner understands that your love for humanity doesn't diminish your love for them.",
+    career:"Spiritual teacher, healer, humanitarian leader, counselor, artist whose work transcends entertainment, or any role that serves the highest good. Money and status are irrelevant — only service matters.",
+    destiny:"Your life's purpose is to embody and teach unconditional love. You are the living example of what humanity can become. Your greatest challenge is accepting that you, too, deserve the love you so freely give.",
+    compatible:[6,9,11]}
+};
+
+document.getElementById('calcBtn').addEventListener('click', () => {
+  const m = parseInt(document.getElementById('birthMonth').value);
+  const d = parseInt(document.getElementById('birthDay').value);
+  const y = parseInt(document.getElementById('birthYear').value);
+  if (!m || !d || !y || y < 1900 || y > 2025) { alert('Please enter a valid birth date.'); return; }
+  const { number, breakdown } = calcLifePath(m, d, y);
+  const r = R[number];
+  if (!r) return;
+  const isMaster = MASTER.includes(number);
+  const el = document.getElementById('result');
+  el.innerHTML = `
+    <div class="number-display">
+      <div class="number-big">${number}</div>
+      <div class="number-title">Life Path ${number} — ${r.title}</div>
+      ${isMaster ? '<div class="master-badge">✦ Master Number</div>' : ''}
+      <div class="calc-breakdown">${breakdown}</div>
+      <div class="keywords">${r.keywords.map(k => `<span>${k}</span>`).join('')}</div>
+    </div>
+    <div class="trait-grid">
+      <div class="glass-card trait-card"><span class="trait-icon">🧬</span><h3>Core Personality</h3><p>${r.personality}</p></div>
+      <div class="glass-card trait-card"><span class="trait-icon">⚡</span><h3>Strengths</h3><p>${r.strengths}</p></div>
+      <div class="glass-card trait-card"><span class="trait-icon">🌊</span><h3>Challenges</h3><p>${r.challenges}</p></div>
+      <div class="glass-card trait-card"><span class="trait-icon">❤️</span><h3>Love & Relationships</h3><p>${r.love}</p></div>
+      <div class="glass-card trait-card"><span class="trait-icon">💼</span><h3>Career & Purpose</h3><p>${r.career}</p></div>
+      <div class="glass-card trait-card"><span class="trait-icon">🌟</span><h3>Life Destiny</h3><p>${r.destiny}</p></div>
+    </div>
+    <div class="glass-card detail-section" style="text-align:center;padding:2rem">
+      <h2>Most Compatible Life Paths</h2>
+      <div class="divider"></div>
+      <div class="compat-numbers">${r.compatible.map(n => `<div class="compat-num">${n}</div>`).join('')}</div>
+    </div>`;
+  el.classList.add('show');
+  el.scrollIntoView({behavior:'smooth',block:'start'});
+});
+</script>
+</body>
+</html>

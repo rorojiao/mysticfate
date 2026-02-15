@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tarot Reading — MysticFate | Free 78-Card Tarot Spreads</title>
+  <meta name="description" content="Free online tarot reading with all 78 cards. Choose daily pull, three-card spread, or Celtic Cross. Upright and reversed interpretations included.">
+  <meta name="keywords" content="tarot reading, free tarot, daily tarot, three card spread, celtic cross, tarot cards meaning">
+  <meta property="og:title" content="Free Tarot Reading — MysticFate">
+  <meta property="og:description" content="Draw from the complete 78-card tarot deck. Daily pulls, three-card spreads, and Celtic Cross readings.">
+  <meta property="og:type" content="website">
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"WebPage","name":"Free Tarot Reading","description":"Draw from the complete 78-card tarot deck with upright and reversed interpretations.","isPartOf":{"@type":"WebSite","name":"MysticFate"}}
+  </script>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .spread-select { text-align: center; margin-bottom: 3rem; }
+    .spread-options { display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap; margin-top: 1.5rem; }
+    .spread-btn { cursor: pointer; }
+    .spread-btn.active { background: var(--gold); color: var(--deep-purple); }
+
+    .card-area {
+      display: flex;
+      justify-content: center;
+      gap: 1.5rem;
+      flex-wrap: wrap;
+      margin: 2rem 0;
+      min-height: 300px;
+      perspective: 1000px;
+    }
+    .tarot-card {
+      width: 160px;
+      height: 260px;
+      position: relative;
+      cursor: pointer;
+      transform-style: preserve-3d;
+      transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .tarot-card.flipped { transform: rotateY(180deg); }
+    .tarot-card.reversed.flipped { transform: rotateY(180deg) rotate(180deg); }
+    .card-face {
+      position: absolute;
+      inset: 0;
+      backface-visibility: hidden;
+      border-radius: var(--radius);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      border: 2px solid var(--glass-border);
+      overflow: hidden;
+    }
+    .card-back {
+      background: linear-gradient(135deg, var(--purple-mid), var(--purple));
+      border-color: var(--gold-dim);
+    }
+    .card-back::before {
+      content: '✦';
+      font-size: 3rem;
+      color: var(--gold);
+      opacity: 0.4;
+      animation: glow-pulse 3s infinite;
+    }
+    .card-back::after {
+      content: 'TAP TO REVEAL';
+      font-family: 'Inter', sans-serif;
+      font-size: 0.6rem;
+      color: var(--gold-dim);
+      letter-spacing: 2px;
+      position: absolute;
+      bottom: 1rem;
+    }
+    .card-front {
+      background: linear-gradient(180deg, #1a1035, #0d0a1a);
+      transform: rotateY(180deg);
+      text-align: center;
+      padding: 1rem 0.8rem;
+      border-color: var(--gold);
+    }
+    .card-front .card-symbol { font-size: 2.2rem; margin-bottom: 0.3rem; }
+    .card-front .card-name {
+      font-family: 'Cinzel', serif;
+      font-size: 0.75rem;
+      color: var(--gold);
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      line-height: 1.3;
+    }
+    .card-front .card-pos {
+      font-family: 'Inter', sans-serif;
+      font-size: 0.6rem;
+      color: var(--text-dim);
+      margin-top: 0.3rem;
+      letter-spacing: 0.5px;
+    }
+    .card-label {
+      text-align: center;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.7rem;
+      color: var(--text-dim);
+      letter-spacing: 1px;
+      margin-top: 0.5rem;
+    }
+    .card-wrapper { display: flex; flex-direction: column; align-items: center; }
+
+    .reading-result {
+      margin-top: 2rem;
+      display: none;
+    }
+    .reading-result.show { display: block; }
+    .reading-card-detail {
+      margin-bottom: 2rem;
+      padding: 2rem;
+      animation: fadeIn 0.6s ease-out both;
+    }
+    .reading-card-detail h3 { margin-bottom: 0.3rem; }
+    .reading-card-detail .position-label {
+      font-family: 'Inter', sans-serif;
+      font-size: 0.75rem;
+      color: var(--gold-dim);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 1rem;
+      display: block;
+    }
+    .reading-card-detail .orientation {
+      display: inline-block;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.65rem;
+      padding: 0.2rem 0.6rem;
+      border-radius: 20px;
+      margin-bottom: 1rem;
+      letter-spacing: 0.5px;
+    }
+    .orientation.upright { background: rgba(72, 187, 120, 0.15); color: #68d391; border: 1px solid rgba(72, 187, 120, 0.3); }
+    .orientation.reversed { background: rgba(245, 101, 101, 0.15); color: #fc8181; border: 1px solid rgba(245, 101, 101, 0.3); }
+    .reading-card-detail p { color: var(--text); font-size: 1.05rem; line-height: 1.7; }
+
+    .draw-btn-wrap { text-align: center; margin: 2rem 0; }
+
+    /* Celtic Cross layout */
+    .celtic-cross {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      grid-template-rows: repeat(4, auto);
+      gap: 1rem;
+      max-width: 900px;
+      margin: 0 auto;
+      justify-items: center;
+    }
+    .celtic-cross .card-wrapper:nth-child(1) { grid-column: 2; grid-row: 2; }
+    .celtic-cross .card-wrapper:nth-child(2) { grid-column: 2; grid-row: 2; transform: rotate(90deg); margin-top: 2rem; }
+    .celtic-cross .card-wrapper:nth-child(3) { grid-column: 2; grid-row: 3; }
+    .celtic-cross .card-wrapper:nth-child(4) { grid-column: 1; grid-row: 2; }
+    .celtic-cross .card-wrapper:nth-child(5) { grid-column: 2; grid-row: 1; }
+    .celtic-cross .card-wrapper:nth-child(6) { grid-column: 3; grid-row: 2; }
+    .celtic-cross .card-wrapper:nth-child(7) { grid-column: 5; grid-row: 4; }
+    .celtic-cross .card-wrapper:nth-child(8) { grid-column: 5; grid-row: 3; }
+    .celtic-cross .card-wrapper:nth-child(9) { grid-column: 5; grid-row: 2; }
+    .celtic-cross .card-wrapper:nth-child(10) { grid-column: 5; grid-row: 1; }
+
+    @media (max-width: 768px) {
+      .tarot-card { width: 120px; height: 200px; }
+      .celtic-cross { grid-template-columns: repeat(3, 1fr); }
+      .celtic-cross .card-wrapper { grid-column: auto !important; grid-row: auto !important; transform: none !important; margin-top: 0 !important; }
+    }
+  </style>
+</head>
+<body>
+  <nav class="nav">
+    <a href="index.html" class="nav-logo">✦ MysticFate</a>
+    <button class="nav-toggle" onclick="document.querySelector('.nav-links').classList.toggle('open')">☰</button>
+    <ul class="nav-links">
+      <li><a href="tarot.html" class="active">Tarot</a></li>
+      <li><a href="zodiac.html">Zodiac</a></li>
+      <li><a href="numerology.html">Numerology</a></li>
+      <li><a href="compatibility.html">Compatibility</a></li>
+    </ul>
+  </nav>
+
+  <main>
+    <section class="section">
+      <div class="spread-select">
+        <h1 class="fade-in">Tarot Reading</h1>
+        <p class="subtitle fade-in-delay">Close your eyes. Take a breath. Let your question form in your mind.</p>
+        <div class="divider"></div>
+        <div class="spread-options">
+          <button class="btn spread-btn active" data-spread="daily">Daily Card</button>
+          <button class="btn spread-btn" data-spread="three">Three-Card Spread</button>
+          <button class="btn spread-btn" data-spread="celtic">Celtic Cross</button>
+        </div>
+      </div>
+
+      <div class="draw-btn-wrap">
+        <button class="btn btn-primary" id="drawBtn">Draw Your Cards</button>
+      </div>
+
+      <div class="card-area" id="cardArea"></div>
+
+      <div class="reading-result" id="readingResult"></div>
+    </section>
+
+    <div class="tip-jar">
+      <h3>☕ Support MysticFate</h3>
+      <p>Enjoyed your reading? Buy MysticFate a coffee ☕</p>
+      <div class="tip-networks"><span>ETH</span><span>USDC</span><span>BSC</span><span>Polygon</span></div>
+      <div class="wallet-address" onclick="navigator.clipboard.writeText('0xEeD903787Cb86bcCc17777E5C7d10A4c2De43823').then(()=>this.textContent='✓ Copied!')">0xEeD903787Cb86bcCc17777E5C7d10A4c2De43823</div>
+    </div>
+  </main>
+  <footer class="footer"><p>© 2025 MysticFate · For entertainment purposes</p></footer>
+
+<script>
+const TAROT_DECK = [
+  // Major Arcana
+  {name:"The Fool",symbol:"🃏",upright:"New beginnings, spontaneity, a free spirit. The Fool steps off the cliff edge not out of ignorance, but out of radical trust. This card whispers that the universe catches those brave enough to leap. Something entirely new is calling you — a chapter that can't begin until you release your grip on the familiar.",reversed:"Recklessness, fear of the unknown, holding back. The Fool reversed suggests you're either leaping without looking or refusing to leap at all. There's a hesitation born of past wounds, or perhaps a naïve rush that ignores real consequences. Pause — but don't freeze."},
+  {name:"The Magician",symbol:"🎭",upright:"Manifestation, resourcefulness, power of will. The Magician reminds you that every tool you need is already on the table before you. Channel, focus, create. You are the conduit between intention and reality — stop waiting for permission and start channeling your gifts.",reversed:"Manipulation, poor planning, untapped talents. Reversed, the Magician warns of illusions — either ones you're creating for others or ones you've fallen for yourself. Your potential is immense but scattered. Ground yourself before you try to conjure anything."},
+  {name:"The High Priestess",symbol:"🌙",upright:"Intuition, sacred knowledge, the subconscious mind. She sits at the threshold between the seen and unseen, guarding mysteries that logic cannot reach. Trust what you feel beneath the surface. The answers you seek won't come from research — they'll come from stillness.",reversed:"Secrets, disconnected from intuition, withdrawal. The High Priestess reversed suggests you've been ignoring your inner voice or that someone is withholding important information. Reconnect with your deeper knowing — the noise of the world has drowned it out."},
+  {name:"The Empress",symbol:"👑",upright:"Abundance, nurturing, fertility, sensual pleasure. The Empress is the garden in full bloom — she represents creative expression, material comfort, and the deep satisfaction of bringing something beautiful into being. Nourish what you love and watch it flourish.",reversed:"Creative block, dependence, emptiness. Reversed, the Empress signals neglect — of yourself, your body, or your creative spark. You may be giving too much to others and keeping nothing for yourself, or smothering someone with attention they didn't ask for."},
+  {name:"The Emperor",symbol:"🏛️",upright:"Authority, structure, a father figure, solid foundation. The Emperor builds empires through discipline and clear vision. This card calls you to take command of your situation — establish order, set boundaries, and lead with both strength and wisdom.",reversed:"Domination, excessive control, rigidity. The Emperor reversed warns of tyranny — perhaps your own. Control has tipped into oppression, whether you're wielding it or suffering under it. Flexibility isn't weakness; it's the difference between a pillar and a prison."},
+  {name:"The Hierophant",symbol:"⛪",upright:"Spiritual wisdom, religious beliefs, tradition, conformity. The Hierophant represents established institutions, mentorship, and the wisdom passed down through lineage. Sometimes the old ways hold profound truth. Seek guidance from those who've walked this path before.",reversed:"Personal beliefs, freedom, challenging the status quo. Reversed, the Hierophant urges you to question inherited dogma. The traditions that once served you may now confine you. Your spiritual authority lives within — stop outsourcing your truth."},
+  {name:"The Lovers",symbol:"❤️",upright:"Love, harmony, relationships, values alignment, choices. The Lovers transcend romance — this card speaks to any profound union or choice that defines who you become. A decision stands before you that requires you to align head and heart as one.",reversed:"Self-love, disharmony, imbalance, misalignment. Reversed, the Lovers suggest an inner conflict — your values and actions are at war. A relationship may be out of balance, or you're avoiding a choice that demands honesty about what you truly want."},
+  {name:"The Chariot",symbol:"⚔️",upright:"Willpower, determination, triumph through inner strength. The Chariot charges forward, pulled by opposing forces held together through sheer will. Victory is yours — but only if you can harness your conflicting desires into one focused direction.",reversed:"Self-doubt, lack of direction, aggression. The Chariot reversed means the reins have slipped. You're either forcing your way through obstacles that require finesse, or you've lost your sense of direction entirely. Regroup before you charge ahead."},
+  {name:"Strength",symbol:"🦁",upright:"Inner strength, bravery, compassion, quiet influence. This isn't brute force — it's the gentle hand that tames the lion. Your greatest power right now comes from patience, kindness, and the quiet courage to face what frightens you without flinching.",reversed:"Self-doubt, weakness, insecurity, raw emotion. Reversed, Strength warns that fear is winning. You may be doubting your own resilience or letting anxiety dictate your choices. The lion inside you hasn't disappeared — you've just stopped trusting it."},
+  {name:"The Hermit",symbol:"🏔️",upright:"Soul-searching, introspection, solitude, inner guidance. The Hermit climbs the mountain alone, carrying a lantern that illuminates only the next step. This is your season of withdrawal — not from weakness, but from wisdom. The answers you need exist in silence.",reversed:"Isolation, loneliness, withdrawal. The Hermit reversed suggests solitude has curdled into loneliness. You've been alone too long, or you're avoiding necessary reflection by staying constantly busy. Find the balance between healthy solitude and self-imposed exile."},
+  {name:"Wheel of Fortune",symbol:"🎡",upright:"Good luck, karma, life cycles, destiny, a turning point. The Wheel reminds you that nothing — neither fortune nor misfortune — lasts forever. A great shift is underway. Embrace the movement; resistance only guarantees you'll be dragged rather than carried.",reversed:"Bad luck, resistance to change, breaking cycles. Reversed, the Wheel suggests you're fighting against a natural transition or trapped in a karmic loop. The universe is trying to move you forward, but you keep reaching for what's behind you."},
+  {name:"Justice",symbol:"⚖️",upright:"Fairness, truth, cause and effect, accountability. Justice holds her sword and scales with unwavering precision. The truth will surface, consequences will arrive, and balance will be restored. If you've acted with integrity, you have nothing to fear.",reversed:"Unfairness, lack of accountability, dishonesty. Justice reversed warns that something is out of balance — a situation is unjust, someone is avoiding accountability, or you're not being honest with yourself about your role in a conflict."},
+  {name:"The Hanged Man",symbol:"🙃",upright:"Surrender, letting go, new perspectives, sacrifice. The Hanged Man doesn't struggle — he hangs by choice, seeing the world from an angle no one else considers. Release your grip on how things 'should' be. In surrender, enlightenment waits.",reversed:"Delays, resistance, stalling, needless sacrifice. Reversed, the Hanged Man suggests you're either martyring yourself unnecessarily or stubbornly refusing to see another perspective. Something needs to be released, but you're white-knuckling it instead."},
+  {name:"Death",symbol:"💀",upright:"Endings, change, transformation, transition. Death is not destruction — it is the composting of what was into the soil of what will be. Something in your life is ending so profoundly that you will not be the same person on the other side. Let it die with grace.",reversed:"Resistance to change, personal transformation delayed, stagnation. Death reversed means you're clinging to something that has already expired. The transformation is happening whether you cooperate or not — resistance only extends the pain."},
+  {name:"Temperance",symbol:"⚗️",upright:"Balance, moderation, patience, finding meaning. Temperance pours water between two cups in an endless, meditative flow. This card calls for the middle path — not lukewarm compromise, but the artful blending of opposites into something greater than either alone.",reversed:"Imbalance, excess, self-healing, realignment. Reversed, Temperance signals that something has tipped too far in one direction. You've been overindulging, overworking, or over-giving. The recipe is off — adjust before you burn the whole thing."},
+  {name:"The Devil",symbol:"😈",upright:"Shadow self, attachment, addiction, restriction, sexuality. The Devil reveals the chains you've placed on yourself — the habits, relationships, and beliefs that imprison you while you pretend they don't. The chains are loose enough to lift over your head. Will you?",reversed:"Releasing limiting beliefs, exploring dark thoughts, detachment. The Devil reversed is a liberation card — you're breaking free from what bound you, seeing clearly through illusions that once controlled you. The shadow, once faced, loses its power."},
+  {name:"The Tower",symbol:"🗼",upright:"Sudden change, upheaval, chaos, revelation, awakening. Lightning strikes the Tower, and everything built on false foundations crumbles. This isn't punishment — it's liberation disguised as destruction. What falls apart now was never going to hold. Trust the demolition.",reversed:"Personal transformation, fear of change, averting disaster. The Tower reversed suggests the upheaval is internal rather than external. You may be on the edge of a breakdown — or a breakthrough. Sometimes the Tower falls in slow motion, giving you time to step out before it collapses."},
+  {name:"The Star",symbol:"⭐",upright:"Hope, faith, purpose, renewal, serenity. After the Tower's destruction, the Star appears — naked, vulnerable, and luminous. This is the calm after the storm, the quiet knowing that everything will be okay. Pour your heart into healing; the universe is watching over you.",reversed:"Lack of faith, despair, self-trust, disconnection. The Star reversed means you've lost sight of hope. The light hasn't gone out — you've just stopped looking up. This is temporary darkness, not permanent absence. Reconnect with what once inspired you."},
+  {name:"The Moon",symbol:"🌕",upright:"Illusion, fear, anxiety, subconscious, intuition. The Moon illuminates a landscape of shadows where nothing is quite what it seems. Trust your instincts over your eyes right now. Confusion and anxiety are part of the journey — the path through uncertainty requires you to feel your way forward.",reversed:"Release of fear, repressed emotion, inner confusion. The Moon reversed brings clarity after confusion — the fog is lifting, and what once seemed terrifying reveals itself as manageable. Repressed emotions may surface now, demanding to be felt."},
+  {name:"The Sun",symbol:"☀️",upright:"Positivity, fun, warmth, success, vitality. The Sun blazes with uncomplicated joy — this is the card of yes. Whatever you're hoping for, whatever you've been working toward, the light is shining directly on it. Success, happiness, and radiant energy surround you.",reversed:"Inner child, feeling down, overly optimistic. The Sun reversed hasn't lost its warmth, but clouds obscure it temporarily. You may be struggling to see the bright side, or you're wearing optimism as a mask over real pain. Let yourself feel both the shadow and the light."},
+  {name:"Judgement",symbol:"📯",upright:"Judgement, rebirth, inner calling, absolution. The trumpet sounds, and the dead rise — not to be condemned, but to be reborn. This is your moment of reckoning and renewal. Answer the call that's been growing louder inside you. Forgive yourself, and rise.",reversed:"Self-doubt, inner critic, ignoring the call. Judgement reversed means you're either judging yourself too harshly or refusing to hear a call that demands your attention. The resurrection can't happen if you insist on staying in the tomb."},
+  {name:"The World",symbol:"🌍",upright:"Completion, integration, accomplishment, travel. The World card is the final exhale — the dance of completion, the integration of every lesson learned through the entire journey. A major cycle is complete. You've arrived. Celebrate before the next spiral begins.",reversed:"Seeking personal closure, short-cuts, delays. The World reversed suggests you're almost there but not quite. A final piece is missing — a lesson unlearned, a conversation unfinished, a fear unfaced. Complete what remains before you claim the prize."},
+  // Wands
+  {name:"Ace of Wands",symbol:"🔥",upright:"Inspiration, new opportunities, growth, potential. A spark of pure creative fire has been placed in your hands. This is the seed of something passionate and alive — a project, a calling, a desire that demands to be pursued. Act on it before it cools.",reversed:"An emerging idea not yet fully formed, lack of direction, delays, distractions from creative goals."},
+  {name:"Two of Wands",symbol:"🔥",upright:"Future planning, progress, decisions, discovery. You stand at the edge of the known world, globe in hand, contemplating your next great adventure. The groundwork is laid; now choose your direction with courage and vision.",reversed:"Fear of the unknown, lack of planning, playing it too safe when boldness is required."},
+  {name:"Three of Wands",symbol:"🔥",upright:"Progress, expansion, foresight, overseas opportunities. Your ships are on the horizon — the investments of energy you've made are beginning to return. Expand your vision; think bigger than your current borders allow.",reversed:"Playing small, lack of foresight, delays in plans coming to fruition, unexpected obstacles."},
+  {name:"Four of Wands",symbol:"🔥",upright:"Celebration, joy, harmony, relaxation, homecoming. The Four of Wands is a harvest festival — a moment to pause and celebrate what you've built. Community, stability, and joyful milestones surround you.",reversed:"Personal celebration, inner harmony, conflict with community, transition, feeling unwelcome."},
+  {name:"Five of Wands",symbol:"🔥",upright:"Conflict, disagreements, competition, tension. Five figures clash their wands in chaotic combat — but look closely: no one is wounded. This is creative friction, healthy competition, or the messy process of working out differences. Lean into the conflict; resolution lives on the other side.",reversed:"Inner conflict, conflict avoidance, tension release, finding common ground."},
+  {name:"Six of Wands",symbol:"🔥",upright:"Success, public recognition, progress, self-confidence. The crowd cheers as you ride through with your laurel wreath held high. This is your victory lap — own it fully. Your efforts have been seen and celebrated.",reversed:"Private achievement, fall from grace, self-doubt despite success, egotism."},
+  {name:"Seven of Wands",symbol:"🔥",upright:"Challenge, competition, protection, perseverance. You stand on higher ground, defending your position against those who want to take it. The advantage is yours, but you must fight to keep it. Don't back down now — you've earned this hill.",reversed:"Exhaustion, giving up, overwhelmed by competition, self-doubt about your position."},
+  {name:"Eight of Wands",symbol:"🔥",upright:"Speed, action, air travel, movement, swift change. Eight wands fly through the air with unstoppable momentum. Things are about to accelerate dramatically. Messages arrive, travel beckons, and delays evaporate. Hold on — the pace is about to pick up.",reversed:"Delays, frustration, resisting change, internal alignment needed before action."},
+  {name:"Nine of Wands",symbol:"🔥",upright:"Resilience, courage, persistence, test of faith, boundaries. Battered but unbroken, the figure leans on their wand with eight more standing guard behind them. You've been through so much — but you're still here. One final push is needed. Don't quit on the last mile.",reversed:"Inner resources, struggle, overwhelm, defensive, paranoia, on the verge of giving up."},
+  {name:"Ten of Wands",symbol:"🔥",upright:"Burden, extra responsibility, hard work, completion. You're carrying ten wands and can barely see where you're going. The weight is real, but the destination is close. Consider what you can delegate or release — not everything on your back belongs to you.",reversed:"Doing it all, carrying too much, delegation, release, burnout, inability to set boundaries."},
+  {name:"Page of Wands",symbol:"🔥",upright:"Inspiration, ideas, discovery, limitless potential, free spirit. The Page of Wands is a dreamer with a fire in their belly — full of ideas, curiosity, and the infectious enthusiasm of someone who hasn't yet learned to be cynical. Follow that spark.",reversed:"Newly formed ideas, redirecting energy, self-limiting beliefs, a creative spark waiting to be nurtured."},
+  {name:"Knight of Wands",symbol:"🔥",upright:"Energy, passion, inspired action, adventure, impulsiveness. The Knight charges forward with absolute confidence and zero hesitation. This is the energy of bold action, passionate pursuit, and saying yes before you've thought it through. Harness the fire — but don't burn the map.",reversed:"Passion project stalled, haste, scattered energy, delays in travel, frustration with pace."},
+  {name:"Queen of Wands",symbol:"🔥",upright:"Courage, confidence, independence, social butterfly, determination. The Queen of Wands commands every room she enters — not through dominance, but through radiant, magnetic presence. She knows who she is and makes no apologies. Channel her energy: be bold, be warm, be unapologetically yourself.",reversed:"Self-respect, self-confidence rebuilding, introverted, re-establishing personal power."},
+  {name:"King of Wands",symbol:"🔥",upright:"Natural-born leader, vision, entrepreneur, honor. The King of Wands leads with charisma, vision, and an unshakable sense of purpose. He inspires others not through fear but through the sheer force of his conviction. Step into your leadership role — people are waiting for your direction.",reversed:"Impulsiveness, haste, ruthless, high expectations, lack of follow-through on grand visions."},
+  // Cups
+  {name:"Ace of Cups",symbol:"🏆",upright:"Love, new relationships, compassion, creativity, overwhelming emotion. The chalice overflows with divine love — this is the purest offering of emotional and spiritual abundance. Open your heart to what's arriving. A new relationship, creative inspiration, or spiritual awakening beckons.",reversed:"Self-love, intuition, repressed emotions, emotional blockage, creative drought."},
+  {name:"Two of Cups",symbol:"🏆",upright:"Unified love, partnership, mutual attraction, soul connection. Two figures exchange cups in a sacred bond — this is the meeting of equals, the recognition of a kindred spirit. Whether romantic or platonic, a powerful connection is forming or deepening.",reversed:"Self-love journey, break-up, disharmony, imbalanced relationship, distrust."},
+  {name:"Three of Cups",symbol:"🏆",upright:"Celebration, friendship, creativity, collaborations, community. Three cups raised in joyful toast — this is the card of reunion, celebration, and the creative magic that happens when kindred spirits gather. Seek out your tribe and celebrate together.",reversed:"Independence, alone time, hardcore partying, gossip, overindulgence, third-party in relationship."},
+  {name:"Four of Cups",symbol:"🏆",upright:"Meditation, contemplation, apathy, reevaluation. A figure sits under a tree, arms crossed, ignoring the cup being offered by a mysterious hand. You may be so focused on what you lack that you're blind to what's being given. Look up.",reversed:"Retreat, withdrawal, checking in with yourself, motivated to accept new opportunities."},
+  {name:"Five of Cups",symbol:"🏆",upright:"Regret, failure, disappointment, pessimism, grief. Three cups have spilled, and you stand mourning over them — but two remain standing behind you. The loss is real and deserves its grief. But when you're ready, turn around. Something was preserved.",reversed:"Personal setbacks, self-forgiveness, moving on, acceptance, finding peace after loss."},
+  {name:"Six of Cups",symbol:"🏆",upright:"Revisiting the past, childhood memories, innocence, joy, nostalgia. The Six of Cups carries the sweet ache of memory — a person or place from your past resurfaces, bringing comfort and perspective. Reconnect with your inner child and the simple things that once brought you joy.",reversed:"Living in the past, unrealistic nostalgia, moving forward, leaving childhood behind."},
+  {name:"Seven of Cups",symbol:"🏆",upright:"Opportunities, choices, wishful thinking, illusion, fantasy. Seven cups float in the clouds, each holding a different temptation or dream. Not all of them are real. Discernment is essential — which vision is grounded in truth, and which is a beautiful mirage?",reversed:"Alignment, personal values, overwhelmed by choices, clarity emerging from confusion."},
+  {name:"Eight of Cups",symbol:"🏆",upright:"Disappointment, abandonment, withdrawal, walking away. A figure walks away from eight carefully stacked cups under a crescent moon. Something that once fulfilled you no longer does. This departure isn't failure — it's the courage to seek deeper meaning elsewhere.",reversed:"Trying one more time, indecision, aimless drifting, fear of leaving the familiar."},
+  {name:"Nine of Cups",symbol:"🏆",upright:"Contentment, satisfaction, gratitude, wish come true. The Nine of Cups is the 'wish card' — a figure sits with arms crossed, nine golden cups arranged behind them in a perfect arc of satisfaction. What you wanted is arriving. Savor it.",reversed:"Inner happiness, materialism, dissatisfaction despite having everything, overindulgence."},
+  {name:"Ten of Cups",symbol:"🏆",upright:"Divine love, blissful relationships, harmony, alignment. A rainbow arches over a joyful family beneath ten radiant cups. This is emotional fulfillment at its peak — the love, peace, and belonging you've been working toward. It's real, and it's here.",reversed:"Disconnection, misaligned values, struggling to find harmony, broken home, unrealistic family expectations."},
+  {name:"Page of Cups",symbol:"🏆",upright:"Creative opportunities, intuitive messages, curiosity, possibility. The Page gazes at a fish emerging from their cup with childlike wonder. A message of emotional or creative significance is arriving — probably from an unexpected source. Stay open and curious.",reversed:"New intuitive insights emerging, emotional immaturity, creative blocks, escaping into fantasy."},
+  {name:"Knight of Cups",symbol:"🏆",upright:"Creativity, romance, charm, imagination, beauty. The Knight of Cups rides in like a poet on horseback — bearing emotional offerings with grace and sincerity. This is the energy of romantic gestures, creative inspiration, and following your heart over your head.",reversed:"Overactive imagination, unrealistic expectations, jealousy, moodiness, creative temperament."},
+  {name:"Queen of Cups",symbol:"🏆",upright:"Compassion, calm, comfort, emotional security, intuition. The Queen of Cups holds her ornate chalice with gentle reverence — she feels everything deeply but is never consumed by it. She is the counselor, the healer, the one who makes you feel truly seen.",reversed:"Inner feelings need attention, self-care, emotional boundaries needed, co-dependency, martyrdom."},
+  {name:"King of Cups",symbol:"🏆",upright:"Emotionally balanced, compassionate, diplomatic, calm under pressure. The King of Cups masters the ocean of emotion without drowning in it. He leads with empathy, makes decisions from a place of calm wisdom, and creates safe harbor for those around him.",reversed:"Self-compassion needed, inner feelings overwhelming, moodiness, emotional manipulation, volatility."},
+  // Swords
+  {name:"Ace of Swords",symbol:"⚔️",upright:"Breakthrough, clarity, sharp mind, truth, new idea. A single sword pierces through clouds, crowned with light. Mental clarity arrives like a blade cutting through fog — a new understanding, a brilliant idea, or a truth that can no longer be denied. Seize this moment of lucidity.",reversed:"Inner clarity forming, confusion, brutality of truth, information overload, need for mental rest."},
+  {name:"Two of Swords",symbol:"⚔️",upright:"Difficult choices, weighing options, an impasse, avoidance. Blindfolded and holding two crossed swords, you sit at a stalemate of your own making. The decision you're avoiding won't make itself. Remove the blindfold and face what you already know.",reversed:"Indecision, confusion, information overload, no right choice, lesser of two evils."},
+  {name:"Three of Swords",symbol:"⚔️",upright:"Heartbreak, emotional pain, sorrow, grief, separation. Three swords pierce a heart against a storming sky. The pain is real and sharp — there's no shortcut through grief. But this card also promises that by fully feeling this, you free yourself from carrying it forever.",reversed:"Negative self-talk, releasing pain, optimism after sorrow, forgiveness, recovery."},
+  {name:"Four of Swords",symbol:"⚔️",upright:"Rest, relaxation, meditation, contemplation, recuperation. A figure lies in repose — not dead, but deeply resting. You've been through a battle, and your mind and body are demanding restoration. This isn't laziness; it's the wisdom of strategic retreat. Heal before you fight again.",reversed:"Restlessness, burnout, stress, lack of rest, pushing through when you should pause."},
+  {name:"Five of Swords",symbol:"⚔️",upright:"Conflict, disagreements, competition, defeat, winning at all costs. The battle is over, and someone walks away with the spoils — but at what cost? This card questions whether the victory was worth the damage. Sometimes the only way to win is to walk away entirely.",reversed:"Reconciliation, forgiveness, moving on, cutting losses, end of conflict."},
+  {name:"Six of Swords",symbol:"⚔️",upright:"Transition, change, rite of passage, releasing baggage. A figure is ferried across calm water toward a distant shore, leaving rough seas behind. You're moving from turbulence to peace — the journey is quiet and perhaps melancholy, but undeniably necessary.",reversed:"Personal transition, resistance to change, unfinished business, emotional baggage slowing you down."},
+  {name:"Seven of Swords",symbol:"⚔️",upright:"Betrayal, deception, getting away with something, acting strategically. A figure sneaks away with five swords, leaving two behind. Someone is being dishonest — possibly you. This card asks: is this cleverness or cowardice? Strategy or self-deception?",reversed:"Imposter syndrome, coming clean, rethinking approach, getting caught, conscience awakening."},
+  {name:"Eight of Swords",symbol:"⚔️",upright:"Imprisonment, entrapment, self-victimization, limiting beliefs. A blindfolded figure stands bound among eight swords — but look closely: the bonds are loose, the cage has gaps. Your prison is largely mental. The restrictions you feel are real but not as absolute as they appear.",reversed:"Self-acceptance, new perspective, freedom from limiting beliefs, taking back power."},
+  {name:"Nine of Swords",symbol:"⚔️",upright:"Anxiety, worry, fear, depression, nightmares. A figure sits up in bed, head in hands, nine swords hanging on the wall behind them. The worst monsters live in your mind at 3 AM. This card acknowledges that the suffering is real — but asks whether the fears are as real as they feel.",reversed:"Inner turmoil easing, hope emerging, reaching out for help, worst is over, recovery."},
+  {name:"Ten of Swords",symbol:"⚔️",upright:"Painful endings, deep wounds, betrayal, loss, crisis. A figure lies face down with ten swords in their back — the most dramatic ending in the deck. Yet the sun rises on the horizon. This is rock bottom, and the only direction from here is up. It's over. Let it be over.",reversed:"Recovery, regeneration, resisting an inevitable end, fear of ruin, can't get worse than this."},
+  {name:"Page of Swords",symbol:"⚔️",upright:"New ideas, curiosity, thirst for knowledge, new ways of communicating. The Page stands alert, sword raised, scanning the horizon with sharp eyes and a sharper mind. Your intellectual curiosity is peaked — research, investigate, ask the questions others are too polite to voice.",reversed:"Self-expression challenges, all talk no action, haste in communication, scattered mental energy."},
+  {name:"Knight of Swords",symbol:"⚔️",upright:"Ambitious, action-oriented, driven to succeed, fast-thinking. The Knight charges headlong into battle with absolute conviction. When this energy appears, things move fast — decisions are made, words are spoken, and actions are taken with fierce determination. Channel this intensity wisely.",reversed:"Restless energy, unfocused, burnout from mental overdrive, arguments, hasty words you can't take back."},
+  {name:"Queen of Swords",symbol:"⚔️",upright:"Independent, unbiased judgement, clear boundaries, direct communication. The Queen of Swords has earned her throne through hard experience — she sees through deception instantly and speaks truth without cruelty. She reminds you that compassion and clarity are not opposites.",reversed:"Overly emotional decisions, need for boundaries, coldness as self-protection, harsh inner critic."},
+  {name:"King of Swords",symbol:"⚔️",upright:"Mental clarity, intellectual power, authority, truth, ethical leadership. The King of Swords rules through the power of his mind — fair, logical, and devastatingly clear. He makes decisions based on truth rather than feeling, and his word is his bond. Think clearly and speak precisely.",reversed:"Quiet power, inner truth, misuse of authority, manipulation through intellect, cold logic without heart."},
+  // Pentacles
+  {name:"Ace of Pentacles",symbol:"💰",upright:"A new financial or career opportunity, manifestation, abundance. A golden coin floats above a lush garden — the universe is handing you the seed of material prosperity. A new job, investment, or practical opportunity is arriving. Plant it wisely and it will grow beyond what you imagine.",reversed:"Lost opportunity, lack of planning, financial setback, need to reassess material goals."},
+  {name:"Two of Pentacles",symbol:"💰",upright:"Multiple priorities, time management, prioritization, adaptability. A figure dances while juggling two pentacles in an infinity loop. Life demands you balance competing priorities with grace and flexibility. You can handle this — just don't try to catch everything at once.",reversed:"Over-committed, disorganization, financial juggling, reprioritization needed, dropping the ball."},
+  {name:"Three of Pentacles",symbol:"💰",upright:"Teamwork, collaboration, learning, implementation. Three figures study architectural plans together — a craftsman, an architect, and a monk. Different skills, shared vision. This card celebrates the magic of collaboration and the early stages of building something with lasting value.",reversed:"Disharmony in a group, lack of alignment, working alone when you need others, ego clashing."},
+  {name:"Four of Pentacles",symbol:"💰",upright:"Saving money, security, conservatism, scarcity, control. A figure clutches four pentacles tightly — one on their head, one under each foot, one pressed to their chest. Security is important, but when does protection become prison? What are you hoarding out of fear?",reversed:"Over-spending, financial insecurity, self-protection, opening up, releasing control."},
+  {name:"Five of Pentacles",symbol:"💰",upright:"Financial loss, poverty, lack mindset, isolation, worry. Two figures trudge through snow past a lit church window — suffering in the cold while warmth and help are right there. Help exists but you're either too proud to ask or too blind to see it. Look up.",reversed:"Recovery from financial loss, spiritual poverty ending, finding help, overcoming hardship."},
+  {name:"Six of Pentacles",symbol:"💰",upright:"Giving, receiving, sharing wealth, generosity, charity. A wealthy figure distributes coins to those in need while holding balanced scales. This card speaks to the sacred flow of giving and receiving — are you in a position to give, or is it time to gracefully receive?",reversed:"Self-care in generosity, strings attached to gifts, power dynamics in giving, debt."},
+  {name:"Seven of Pentacles",symbol:"💰",upright:"Long-term view, sustainable results, perseverance, investment. A gardener leans on their hoe, contemplating the slow-growing pentacles on their vine. The work is done — now comes the hardest part: waiting. Trust the process. Not everything blooms on your schedule.",reversed:"Impatience, lack of reward, poor investment, shortcuts, questioning if the effort is worth it."},
+  {name:"Eight of Pentacles",symbol:"💰",upright:"Apprenticeship, repetitive tasks, mastery, skill development. A craftsman carefully carves pentacle after pentacle, each one better than the last. This is the card of dedicated practice — mastery comes not from talent alone, but from the willingness to do the work again and again.",reversed:"Self-development in private, perfectionism, lack of motivation, misdirected effort, tedium."},
+  {name:"Nine of Pentacles",symbol:"💰",upright:"Abundance, luxury, self-sufficiency, financial independence. A woman stands in a lush vineyard, a falcon on her wrist — she has built this garden through her own effort and intelligence. This is the card of earned luxury, independence, and the deep satisfaction of self-made success.",reversed:"Self-worth, overinvestment in work, financial setback, hustle culture, learning to enjoy what you have."},
+  {name:"Ten of Pentacles",symbol:"💰",upright:"Wealth, financial security, family, long-term success, contribution. Three generations gather under an archway adorned with ten pentacles — this is legacy wealth, family bonds, and the kind of success that outlasts a single lifetime. What you build now serves those who come after.",reversed:"The dark side of wealth, family financial burden, short-term vs long-term thinking, loss of inheritance."},
+  {name:"Page of Pentacles",symbol:"💰",upright:"Manifestation, financial opportunity, skill development, ambition. The Page gazes at a single pentacle with focused wonder — a student of the material world, eager to learn and ready to work. A new financial opportunity or learning path is opening. Approach it with diligence and curiosity.",reversed:"Lack of progress, procrastination, learn from failure, need for practical grounding."},
+  {name:"Knight of Pentacles",symbol:"💰",upright:"Hard work, productivity, routine, conservatism, methodical progress. The Knight of Pentacles moves slowly but covers more ground than anyone. Dependable, thorough, and unshakably committed to the long game. This energy favors steady progress over flashy leaps.",reversed:"Self-discipline needed, boredom, feeling stuck, perfectionism preventing progress, laziness."},
+  {name:"Queen of Pentacles",symbol:"💰",upright:"Nurturing, practical, providing financially, a working parent, down-to-earth luxury. The Queen of Pentacles creates abundance that nourishes everyone around her — she's the one who makes the impossible look effortless. Practical magic, domestic grace, and genuine warmth.",reversed:"Financial independence being rebuilt, work-home balance, self-care neglect, over-giving materially."},
+  {name:"King of Pentacles",symbol:"💰",upright:"Wealth, business, leadership, security, discipline, abundance. The King of Pentacles has built his empire through patience, discipline, and shrewd decision-making. He represents material mastery, financial wisdom, and the quiet confidence of someone who has already proven themselves.",reversed:"Financially inept, obsessed with wealth and status, stubborn, materialistic values over human ones."}
+];
+
+const SPREAD_LABELS = {
+  daily: ['Your Card'],
+  three: ['Past', 'Present', 'Future'],
+  celtic: ['Present', 'Challenge', 'Foundation', 'Recent Past', 'Crown', 'Near Future', 'Self', 'Environment', 'Hopes & Fears', 'Outcome']
+};
+
+let currentSpread = 'daily';
+let drawnCards = [];
+
+document.querySelectorAll('.spread-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.spread-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    currentSpread = btn.dataset.spread;
+    document.getElementById('cardArea').innerHTML = '';
+    document.getElementById('readingResult').innerHTML = '';
+    document.getElementById('readingResult').classList.remove('show');
+  });
+});
+
+document.getElementById('drawBtn').addEventListener('click', drawCards);
+
+function drawCards() {
+  const area = document.getElementById('cardArea');
+  const result = document.getElementById('readingResult');
+  area.innerHTML = '';
+  result.innerHTML = '';
+  result.classList.remove('show');
+
+  const labels = SPREAD_LABELS[currentSpread];
+  const count = labels.length;
+  drawnCards = [];
+
+  // Shuffle & pick
+  const shuffled = [...TAROT_DECK].sort(() => Math.random() - 0.5);
+  for (let i = 0; i < count; i++) {
+    const card = { ...shuffled[i], isReversed: Math.random() < 0.35 };
+    drawnCards.push(card);
+  }
+
+  if (currentSpread === 'celtic') area.classList.add('celtic-cross');
+  else area.classList.remove('celtic-cross');
+
+  drawnCards.forEach((card, i) => {
+    const wrapper = document.createElement('div');
+    wrapper.className = 'card-wrapper';
+    wrapper.style.animationDelay = `${i * 0.15}s`;
+
+    const el = document.createElement('div');
+    el.className = `tarot-card ${card.isReversed ? 'reversed' : ''}`;
+    el.innerHTML = `
+      <div class="card-face card-back"></div>
+      <div class="card-face card-front">
+        <span class="card-symbol">${card.symbol}</span>
+        <span class="card-name">${card.name}</span>
+        <span class="card-pos">${card.isReversed ? '⟲ Reversed' : '↑ Upright'}</span>
+      </div>`;
+    el.addEventListener('click', () => {
+      el.classList.add('flipped');
+      setTimeout(() => showReading(), 600);
+    });
+
+    const label = document.createElement('div');
+    label.className = 'card-label';
+    label.textContent = labels[i];
+
+    wrapper.appendChild(el);
+    wrapper.appendChild(label);
+    area.appendChild(wrapper);
+  });
+}
+
+function showReading() {
+  const allFlipped = document.querySelectorAll('.tarot-card.flipped').length === drawnCards.length;
+  if (!allFlipped) return;
+
+  const result = document.getElementById('readingResult');
+  const labels = SPREAD_LABELS[currentSpread];
+  result.innerHTML = '<h2 style="text-align:center;margin-bottom:2rem;">Your Reading</h2>';
+
+  drawnCards.forEach((card, i) => {
+    const detail = document.createElement('div');
+    detail.className = 'glass-card reading-card-detail';
+    detail.style.animationDelay = `${i * 0.2}s`;
+    detail.innerHTML = `
+      <span class="position-label">${labels[i]}</span>
+      <h3>${card.symbol} ${card.name}</h3>
+      <span class="orientation ${card.isReversed ? 'reversed' : 'upright'}">${card.isReversed ? '⟲ Reversed' : '↑ Upright'}</span>
+      <p>${card.isReversed ? card.reversed : card.upright}</p>`;
+    result.appendChild(detail);
+  });
+
+  result.classList.add('show');
+  setTimeout(() => result.scrollIntoView({ behavior: 'smooth', block: 'start' }), 300);
+}
+</script>
+</body>
+</html>
